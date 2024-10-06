@@ -1,7 +1,9 @@
+// #define DEBUG
+
 #include "lfu_cache.hpp"
-#include <iostream>
 #include <fstream>
 #include <vector>
+
 
 int slow_get_page(int key) {
     return key;
