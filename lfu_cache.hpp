@@ -4,7 +4,6 @@
 #include <list>
 #include <unordered_map>
 #include <iostream>
-#include <algorithm>
 
 template <typename PageT, typename KeyT = int>
 class LFUCache {
@@ -19,7 +18,7 @@ class LFUCache {
     std::unordered_map<KeyT, ListIt> hash;
     std::unordered_map<KeyT, FreqT> freq;
     std::unordered_map<FreqT, std::list<KeyT>> listsOfFreqs;
-    // std::unordered_map<KeyT, ListIt> listsOfFreqsHash;
+    std::unordered_map<KeyT, ListIt> listsOfFreqsHash;
 
     void debug_print() {
         std::cout << "==========================================\n";
@@ -30,7 +29,7 @@ class LFUCache {
         std::cout << "\n\n";
 
         std::cout << "listsOfFreqs:\n";
-        for (int i = 0; i < listsOfFreqs.size(); ++i) {
+        for (int i = 1; i <= listsOfFreqs.size(); ++i) {
             std::cout << "freq[" << i << "]: ";
             for (auto it = listsOfFreqs[i].begin(); it != listsOfFreqs[i].end(); ++it) {
                 std::cout << *it << " ";
@@ -41,9 +40,11 @@ class LFUCache {
     }
 
     void replace(KeyT key) {
-        listsOfFreqs[freq[key]].erase(std::find(listsOfFreqs[freq[key]].begin(), listsOfFreqs[freq[key]].end(), *hash[key]));
+        listsOfFreqs[freq[key]].erase(listsOfFreqsHash[key]);
         ++freq[key];
         listsOfFreqs[freq[key]].push_back(key);
+        typename std::list<PageT>::iterator preLastIt = listsOfFreqs[freq[key]].end();
+        listsOfFreqsHash[key] = --preLastIt;
     }
 
 public:
@@ -55,6 +56,7 @@ public:
             if(full()) {
                 cache.erase(hash[listsOfFreqs[minFreq].front()]);
                 hash.erase(listsOfFreqs[minFreq].front());
+                listsOfFreqsHash.erase(listsOfFreqs[minFreq].front());
                 listsOfFreqs[minFreq].pop_front();
                 --curAmount;
             }
@@ -70,23 +72,30 @@ public:
             }
 
             listsOfFreqs[freq[key]].push_back(key);
+            typename std::list<PageT>::iterator preLastIt = listsOfFreqs[freq[key]].end();
+            listsOfFreqsHash[key] = --preLastIt;
 
             if (listsOfFreqs[minFreq].empty() || minFreq > freq[key]) {
                 minFreq = freq[key];
             }
 
             ++curAmount;
-            // debug_print();
+#ifdef DEBUG
+            debug_print();
+#endif
             return false;
         }
 
         replace(key); //found
 
+
         if (listsOfFreqs[minFreq].empty() || minFreq > freq[key]) {
             minFreq = freq[key];
         }
 
-        // debug_print();
+#ifdef DEBUG
+        debug_print();
+#endif
         return true;
     }
 
