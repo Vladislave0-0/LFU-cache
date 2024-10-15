@@ -4,4 +4,5 @@ project("LFU-cache")
 
 include_directories(include/)
 
+add_executable (perfect_cache src/perfect_cache.cpp)
 add_executable (lfu_cache src/lfu_cache.cpp)

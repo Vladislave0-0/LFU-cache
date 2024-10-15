@@ -1,5 +1,3 @@
-#define DEBUG
-
 #include "../include/lfu_cache.hpp"
 #include <fstream>
 #include <vector>

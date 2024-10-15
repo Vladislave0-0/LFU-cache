@@ -1,5 +1,7 @@
 #pragma once
 
+// #define DEBUG
+
 #include <cstddef>
 #include <iostream>
 #include <list>
@@ -18,6 +20,8 @@ template <typename PageT, typename KeyT = int> class LFUCache {
   std::unordered_map<KeyT, FreqT> freq;
   std::unordered_map<FreqT, std::list<KeyT>> listsOfFreqs;
   std::unordered_map<KeyT, ListIt> listsOfFreqsHash;
+
+  bool full() const { return (curAmount < cacheSize) ? false : true; }
 
   void debug_print() {
     std::cout << "==========================================\n";
@@ -97,6 +101,4 @@ public:
 #endif
     return true;
   }
-
-  bool full() const { return (curAmount < cacheSize) ? false : true; }
 };
