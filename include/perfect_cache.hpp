@@ -10,8 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
-template <typename PageT, typename KeyT = int> class PerfectCache {
-  using LenT = int;
+template <typename PageT, typename KeyT = int> 
+class PerfectCache {
   using ListIt = typename std::list<PageT>::iterator;
 
   size_t cacheSize;
@@ -21,7 +21,7 @@ template <typename PageT, typename KeyT = int> class PerfectCache {
 
   std::list<PageT> cache;
   std::unordered_map<KeyT, ListIt> hash;
-  std::map<LenT, std::deque<KeyT>, std::less<LenT>> nextUse;
+  std::map<KeyT, std::deque<KeyT>, std::less<KeyT>> nextUse;
   std::unordered_map<KeyT, std::list<KeyT>> input;
 
   bool full() const { return (curAmount < cacheSize) ? false : true; }
