@@ -1,6 +1,7 @@
 #pragma once
 
 // #define DEBUG
+// #define TIME
 
 #include <cstddef>
 #include <iostream>
@@ -86,7 +87,7 @@ public:
       ++curAmount;
 #ifdef DEBUG
       debug_print();
-#endif
+#endif // DEBUG
       return false;
     }
 
@@ -98,7 +99,7 @@ public:
 
 #ifdef DEBUG
     debug_print();
-#endif
+#endif // DEBUG
     return true;
   }
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 // #define DEBUG
+// #define TIME
 
 #include <cstddef>
 #include <deque>
@@ -45,7 +46,7 @@ class PerfectCache {
   int getNextHit(KeyT key) {
 #ifdef DEBUG
     debug_print();
-#endif
+#endif // DEBUG
     input[key].pop_front();
     return input[key].front();
   }
@@ -73,7 +74,7 @@ public:
       if (nextItPlace == inputLen) {
 #ifdef DEBUG
         debug_print();
-#endif
+#endif // DEBUG
         return false;
       }
 
@@ -106,7 +107,7 @@ public:
 
 #ifdef DEBUG
     debug_print();
-#endif
+#endif // DEBUG
     return true;
   }
 };
