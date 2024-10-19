@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <limits>
 #include <list>
 #include <unordered_map>
 
@@ -15,6 +16,7 @@ template <typename PageT, typename KeyT = int> class LFUCache {
   size_t cacheSize;
   size_t curAmount = 0;
   FreqT minFreq = 1;
+  size_t hits = 0;
 
   std::list<PageT> cache;
   std::unordered_map<KeyT, ListIt> hash;
@@ -24,8 +26,9 @@ template <typename PageT, typename KeyT = int> class LFUCache {
 
   bool full() const { return (curAmount < cacheSize) ? false : true; }
 
-  void debug_print() {
+  void debug_print(const KeyT key) {
     std::cout << "==========================================\n";
+    std::cout << "curPage = " << key << "\n";
     std::cout << "cache[minFreq = " << minFreq << "]:\n";
     for (auto it = cache.begin(); it != cache.end(); ++it) {
       std::cout << *it << "(" << freq[*it] << ")" << " ";
@@ -48,16 +51,24 @@ template <typename PageT, typename KeyT = int> class LFUCache {
     listsOfFreqs[freq[key]].erase(listsOfFreqsHash[key]);
     ++freq[key];
     listsOfFreqs[freq[key]].push_back(key);
-    typename std::list<PageT>::iterator preLastIt =
-        listsOfFreqs[freq[key]].end();
+    ListIt preLastIt = listsOfFreqs[freq[key]].end();
     listsOfFreqsHash[key] = --preLastIt;
+  }
+
+  void update_min_freq(const KeyT key) {
+    minFreq = std::numeric_limits<FreqT>::max();
+    for (const auto &pair : listsOfFreqs) {
+      if (!pair.second.empty() && pair.first < minFreq) {
+        minFreq = pair.first;
+      }
+    }
   }
 
 public:
   LFUCache(size_t cacheSize) : cacheSize(cacheSize){};
 
   template <typename F> bool lookup_update(KeyT key, F slow_get_page) {
-    if (hash.find(key) == hash.end()) { // not found
+    if (hash.find(key) == hash.end()) { // page not found
       if (full()) {
         cache.erase(hash[listsOfFreqs[minFreq].front()]);
         hash.erase(listsOfFreqs[minFreq].front());
@@ -66,39 +77,33 @@ public:
         --curAmount;
       }
 
+      ++curAmount;
+
       cache.push_front(slow_get_page(key));
       hash[key] = cache.begin();
-
-      if (freq.find(key) == freq.end()) {
-        freq[key] = 1;
-      } else {
-        ++freq[key];
-      }
+      freq[key] = 1;
 
       listsOfFreqs[freq[key]].push_back(key);
-      typename std::list<PageT>::iterator preLastIt =
-          listsOfFreqs[freq[key]].end();
+      ListIt preLastIt = listsOfFreqs[freq[key]].end();
       listsOfFreqsHash[key] = --preLastIt;
 
-      if (listsOfFreqs[minFreq].empty() || minFreq > freq[key]) {
-        minFreq = freq[key];
-      }
+      update_min_freq(key);
 
-      ++curAmount;
 #ifdef DEBUG
-      debug_print();
+      debug_print(key);
 #endif // DEBUG
       return false;
     }
 
-    replace(key); // found
+    replace(key); // page found
 
+    // updating minimum frequency (faster than update_min_freq(key))
     if (listsOfFreqs[minFreq].empty() || minFreq > freq[key]) {
       minFreq = freq[key];
     }
 
 #ifdef DEBUG
-    debug_print();
+    debug_print(key);
 #endif // DEBUG
     return true;
   }

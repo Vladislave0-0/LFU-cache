@@ -93,6 +93,7 @@ public:
       }
 
       ++curAmount;
+      
       cache.push_front(slow_get_page(key));
       hash[key] = cache.begin();
       nextUse.erase(curPage);
@@ -101,7 +102,7 @@ public:
       return false;
     }
 
-    // found
+    // page found
     nextUse.erase(curPage);
     nextUse[nextItPlace].push_back(key);
 
