@@ -11,8 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-template <typename PageT, typename KeyT = int> 
-class PerfectCache {
+template <typename PageT, typename KeyT = int> class PerfectCache {
   using ListIt = typename std::list<PageT>::iterator;
 
   size_t cacheSize;
@@ -30,15 +29,16 @@ class PerfectCache {
   void debug_print() {
     std::cout << "==========================================\n";
 
-    for (auto it = input.begin(); it != input.end(); ++it) {
-      auto list = it->second;
+    for (const auto &it : input) {
+      auto list = it.second;
       auto end = list.end();
       --end;
-      std::cout << "[" << it->first << "]: ";
-      for(auto iter = list.begin(); iter != end; ++iter) {
-          std::cout << *iter << " ";
-      }
-      std::cout << std::endl;
+
+      std::cout << "[" << it.first << "]: ";
+      for (const auto &iter : list)
+        std::cout << iter << " ";
+
+      std::cout << "\n";
     }
     std::cout << "==========================================\n\n";
   }
@@ -55,12 +55,14 @@ public:
   PerfectCache(size_t &cacheSize, size_t &inputLen, std::vector<int> input_arr)
       : cacheSize(cacheSize), inputLen(inputLen) {
     int curPage = 0;
-    for (auto it = input_arr.begin(); it != input_arr.end(); ++it, ++curPage) {
-      input[*it].push_back(curPage);
+
+    for (const auto &it : input_arr) {
+      input[it].push_back(curPage);
+      ++curPage;
     }
-    for (auto it = input.begin(); it != input.end(); ++it) {
-      it->second.push_back(inputLen);
-    }
+
+    for (auto &it : input)
+      it.second.push_back(inputLen);
   }
 
   template <typename F> bool lookup_update(KeyT key, F slow_get_page) {
@@ -70,7 +72,7 @@ public:
 
     if (hash.find(key) == hash.end()) { // page not found
 
-      // if you never meet this page again  
+      // if you never meet this page again
       if (nextItPlace == inputLen) {
 #ifdef DEBUG
         debug_print();
@@ -85,15 +87,14 @@ public:
         hash.erase(it->second.back());
         it->second.pop_back();
 
-        if (it->second.empty()) {
+        if (it->second.empty())
           nextUse.erase(it);
-        }
 
         --curAmount;
       }
 
       ++curAmount;
-      
+
       cache.push_front(slow_get_page(key));
       hash[key] = cache.begin();
       nextUse.erase(curPage);

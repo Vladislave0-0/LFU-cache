@@ -30,19 +30,17 @@ template <typename PageT, typename KeyT = int> class LFUCache {
     std::cout << "==========================================\n";
     std::cout << "curPage = " << key << "\n";
     std::cout << "cache[minFreq = " << minFreq << "]:\n";
-    for (auto it = cache.begin(); it != cache.end(); ++it) {
-      std::cout << *it << "(" << freq[*it] << ")" << " ";
+    for (const auto &it : cache) {
+      std::cout << it << "(" << freq[it] << ")" << " ";
     }
-    std::cout << "\n\n";
 
-    std::cout << "listsOfFreqs:\n";
+    std::cout << "\n\nlistsOfFreqs:\n";
     for (int i = 1; i <= listsOfFreqs.size(); ++i) {
       std::cout << "freq[" << i << "]: ";
-      for (auto it = listsOfFreqs[i].begin(); it != listsOfFreqs[i].end();
-           ++it) {
-        std::cout << *it << " ";
+      for (const auto &it : listsOfFreqs[i]) {
+        std::cout << it << " ";
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
     std::cout << "==========================================\n\n";
   }
@@ -58,9 +56,8 @@ template <typename PageT, typename KeyT = int> class LFUCache {
   void update_min_freq(const KeyT key) {
     minFreq = std::numeric_limits<FreqT>::max();
     for (const auto &pair : listsOfFreqs) {
-      if (!pair.second.empty() && pair.first < minFreq) {
+      if (!pair.second.empty() && pair.first < minFreq)
         minFreq = pair.first;
-      }
     }
   }
 
