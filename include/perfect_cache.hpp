@@ -1,7 +1,7 @@
 #pragma once
 
 // #define DEBUG
-// #define TIME
+#define TIME
 
 #include <cstddef>
 #include <deque>
