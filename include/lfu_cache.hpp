@@ -26,7 +26,7 @@ template <typename PageT, typename KeyT = int> class LFUCache {
 
   bool full() const { return (curAmount < cacheSize) ? false : true; }
 
-  void debug_print(const KeyT key) {
+  void debug_print(const KeyT key) const {
     std::cout << "==========================================\n";
     std::cout << "curPage = " << key << "\n";
     std::cout << "cache[minFreq = " << minFreq << "]:\n";

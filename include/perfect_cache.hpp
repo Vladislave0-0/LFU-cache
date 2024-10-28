@@ -1,7 +1,7 @@
 #pragma once
 
 // #define DEBUG
-#define TIME
+// #define TIME
 
 #include <cstddef>
 #include <deque>
@@ -26,7 +26,7 @@ template <typename PageT, typename KeyT = int> class PerfectCache {
 
   bool full() const { return (curAmount < cacheSize) ? false : true; }
 
-  void debug_print() {
+  void debug_print() const {
     std::cout << "==========================================\n";
 
     for (const auto &it : input) {
